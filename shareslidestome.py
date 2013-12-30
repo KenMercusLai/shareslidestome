@@ -9,6 +9,12 @@ import os
 import time, sys
 
 
+def to_native_string(s):
+    if type(s) == unicode:
+        return s.encode('utf-8')
+    else:
+        return s
+
 # update_progress() : Displays or updates a console progress bar
 ## Accepts a float between 0 and 1. Any int will be converted to a float.
 ## A value under 0 represents a 'halt'.
@@ -92,9 +98,10 @@ def download_pages(links, page_title):
     actions_count = len(keys) + 2
     keys.sort()
     for i in keys:
+        # print i
         url_save(links[str(i)], '%s.%04d.jpg' % (page_title, i))
         update_progress(i * 1.0 / actions_count)
-    os.popen('convert "%s.*.jpg" "%s.pdf"' % (page_title, page_title))
+    os.popen('convert "%s.*.jpg" "%s.pdf"' % (to_native_string(page_title), to_native_string(page_title)))
     update_progress(i+1 * 100.0 / actions_count)
     for i in keys:
         os.remove('%s.%04d.jpg' % (page_title, i))
@@ -103,13 +110,13 @@ def download_pages(links, page_title):
 
 if __name__ == '__main__':
     # if you hit the GFW, uncomment this and set to your proxy ===========
-    # proxy_info = { 'host' : '127.0.0.1',
-    #                'port' : 32123
-    #              }
-    # # proxy_support = urllib2.ProxyHandler({"http" : "http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})
-    # proxy_support = urllib2.ProxyHandler({"http" : "http://%(host)s:%(port)d" % proxy_info})
-    # opener = urllib2.build_opener(proxy_support)
-    # urllib2.install_opener(opener)
+    proxy_info = { 'host' : '127.0.0.1',
+                   'port' : 32123
+                 }
+    # proxy_support = urllib2.ProxyHandler({"http" : "http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})
+    proxy_support = urllib2.ProxyHandler({"http" : "http://%(host)s:%(port)d" % proxy_info})
+    opener = urllib2.build_opener(proxy_support)
+    urllib2.install_opener(opener)
     # ================================================
 
     PAGE = get_html(sys.argv[1])
